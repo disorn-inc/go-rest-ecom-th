@@ -4,7 +4,7 @@ import (
 	// "os"
 
 	"github.com/disorn-inc/go-rest-ecom-th/config"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 type FiberContext struct {
@@ -78,8 +78,9 @@ func NewFiberRouter(cfg config.IConfig) *FiberRouter {
 }
 
 func NewFiberHandler(handler func(Context)) fiber.Handler {
-	return func(c *fiber.Ctx) {
+	return func(c *fiber.Ctx) error {
 		handler(NewFiberContext(c))
+		return nil
 	}
 }
 
@@ -94,9 +95,9 @@ func NewFiberHandlerMiddleware(handler ...func(Context)) []fiber.Handler {
 }
 
 func NewFiberMiddleware(handler func(Context)) fiber.Handler {
-	return func(c *fiber.Ctx) {
+	return func(c *fiber.Ctx) error {
 		handler(NewFiberContext(c))
-		// c.Next()
+		return c.Next()
 	}
 }
 
