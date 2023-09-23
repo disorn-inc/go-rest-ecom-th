@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/disorn-inc/go-rest-ecom-th/config"
+	"github.com/disorn-inc/go-rest-ecom-th/pkg/databases"
 )
 
 func envPath() string {
@@ -16,6 +17,9 @@ func envPath() string {
 
 func main() {
 	cfg := config.LoadConfig(envPath())
-	fmt.Println("test")
-	fmt.Println(cfg.App())
+
+	db := databases.DbConnect(cfg.Db())
+	defer db.Close()
+
+	fmt.Println(db)
 }
