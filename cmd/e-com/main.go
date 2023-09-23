@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/disorn-inc/go-rest-ecom-th/cmd/e-com/servers"
 	"github.com/disorn-inc/go-rest-ecom-th/config"
 	"github.com/disorn-inc/go-rest-ecom-th/pkg/databases"
 )
@@ -22,4 +23,6 @@ func main() {
 	defer db.Close()
 
 	fmt.Println(db)
+
+	servers.NewServer(cfg, db).Start()
 }

@@ -10,7 +10,7 @@ import (
 )
 
 func DbConnect(cfg config.IDbConfig) *sqlx.DB {
-	slog.Info("Connecting to database...", "url", cfg.Url())
+	// slog.Info("Connecting to database...", "url", cfg.Url())
 	db, err := sqlx.Connect("pgx", cfg.Url())
 	if err != nil {
 		slog.Error("Failed to connect to database", "err", err.Error())

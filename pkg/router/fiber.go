@@ -1,7 +1,16 @@
 package router
 
 import (
-	// "os"
+	"context"
+	"fmt"
+	"log"
+	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"encoding/json"
 
 	"github.com/disorn-inc/go-rest-ecom-th/config"
 	"github.com/gofiber/fiber/v2"
@@ -72,7 +81,13 @@ type FiberRouter struct {
 }
 
 func NewFiberRouter(cfg config.IConfig) *FiberRouter {
-	r := fiber.New()
+	r := fiber.New(fiber.Config{
+		ReadTimeout:  cfg.App().ReadTimeout(),
+		WriteTimeout: cfg.App().WriteTimeout(),
+		BodyLimit:    cfg.App().BodyLimit(),
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
+	})
 
 	return &FiberRouter{r}
 }
@@ -137,14 +152,34 @@ func (r *FiberRouter) Group(path string) *FiberGroup {
 	return &FiberGroup{r.App.Group(path)}
 }
 
-// func (r *FiberRouter) ListenAndServe() func() {
-// 	port := os.Getenv("PORT")
-// 	if port == "" {
-// 		port = "8080"
-// 	}
+func (r *FiberRouter) ListenAndServe() func() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 
-	
-// }
+	go func() {
+		if err := r.App.Listen(":" + port); err != nil {
+			log.Fatalf("listen: %s\n", err)
+		}
+	} ()
+
+	return func() {
+		tx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+		defer stop()
+
+		<-tx.Done()
+		stop()
+		fmt.Println("shutting down gracefully, press Ctrl+C again to force")
+
+		tCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := r.App.ShutdownWithContext(tCtx); err != nil {
+			slog.Error("server shutdown error", err)
+		}
+	}
+}
 
 type FiberGroup struct {
 	fiber.Router
