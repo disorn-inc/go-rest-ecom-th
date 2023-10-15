@@ -63,8 +63,10 @@ func (r *Response) Error(code int, traceId string, message string) IResponse {
 }
 
 func (r *Response) Response() {
-	if r.IsError {
-		r.Context.JSON(r.StatusCode, r.ErrorRes)
-	}
-	r.Context.JSON(r.StatusCode, r.Data)
+	r.Context.JSON(r.StatusCode, func() any {
+		if r.IsError {
+			return &r.ErrorRes
+		}
+		return &r.Data
+	}())
 }
