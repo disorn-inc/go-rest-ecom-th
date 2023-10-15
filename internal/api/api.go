@@ -35,6 +35,7 @@ func (a *api) Register(cfg config.IConfig) {
 }
 
 func (a *api) InitialRouter(r *router.FiberRouter) {
+	r.Use(a.Middleware.RouteCheck)
 	a.Router.Initial(r)
 }
 

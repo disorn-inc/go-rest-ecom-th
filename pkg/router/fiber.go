@@ -14,6 +14,8 @@ import (
 
 	"github.com/disorn-inc/go-rest-ecom-th/config"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 type FiberContext struct {
@@ -105,9 +107,21 @@ func NewFiberRouter(cfg config.IConfig) *FiberRouter {
 		ReadTimeout:  cfg.App().ReadTimeout(),
 		WriteTimeout: cfg.App().WriteTimeout(),
 		BodyLimit:    cfg.App().BodyLimit(),
-		JSONEncoder: json.Marshal,
-		JSONDecoder: json.Unmarshal,
+		JSONEncoder:  json.Marshal,
+		JSONDecoder:  json.Unmarshal,
 	})
+
+	r.Use(logger.New())
+
+	r.Use(cors.New(cors.Config{
+		Next:             cors.ConfigDefault.Next,
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+		AllowCredentials: false,
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With, X-Access-Token, X-Refresh-Token, X-Trace-Id",
+		ExposeHeaders:    "",
+		MaxAge:           0,
+	}))
 
 	return &FiberRouter{r}
 }
@@ -182,7 +196,7 @@ func (r *FiberRouter) ListenAndServe() func() {
 		if err := r.App.Listen(":" + port); err != nil {
 			log.Fatalf("listen: %s\n", err)
 		}
-	} ()
+	}()
 
 	return func() {
 		tx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
