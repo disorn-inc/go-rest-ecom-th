@@ -76,6 +76,26 @@ func (c *FiberContext) GetHost() string {
 	return c.Ctx.Hostname()
 }
 
+func (c *FiberContext) GetProtocol() string {
+	return c.Ctx.Protocol()
+}
+
+func (c *FiberContext) GetStatus() int {
+	return c.Ctx.Response().StatusCode()
+}
+
+func (c *FiberContext) GetBody() []byte {
+	return c.Ctx.Body()
+}
+
+func (c *FiberContext) GetBodyString() string {
+	return string(c.Ctx.Body())
+}
+
+// func (c *FiberContext) GetQuery() string {
+// 	return c.Ctx.Q
+// }
+
 type FiberRouter struct {
 	*fiber.App
 }

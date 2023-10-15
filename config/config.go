@@ -40,22 +40,18 @@ func LoadConfig(path string) IConfig {
 				if err != nil {
 					log.Fatalf("Error loading .env file %v", err)
 				}
-				return time.Duration(readTimeout * int(math.Pow10(9)))
+				return time.Duration(int64(readTimeout) * int64(math.Pow10(9)))
 			}(),
 			writeTimeout: func() time.Duration {
-				if envMap["APP_WRITE_TIMEOUT"] == "" {
-					return 15
-				}
-
 				writeTimeout, err := strconv.Atoi(envMap["APP_WRITE_TIMEOUT"])
 				if err != nil {
 					log.Fatalf("Error loading .env file %v", err)
 				}
-				return time.Duration(writeTimeout * int(math.Pow10(9)))
+				return time.Duration(int64(writeTimeout) * int64(math.Pow10(9)))
 			}(),
 			bodyLimit: func() int {
 				if envMap["APP_BODY_LIMIT"] == "" {
-					return 1048576
+					return 10490000
 				}
 
 				bodyLimit, err := strconv.Atoi(envMap["APP_BODY_LIMIT"])

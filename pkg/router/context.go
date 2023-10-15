@@ -13,4 +13,5 @@ type Context interface {
 	GetRemoteIP() string
 	GetMethod() string
 	GetPath() string
+	GetStatus() int
 }

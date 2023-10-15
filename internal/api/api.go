@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/disorn-inc/go-rest-ecom-th/config"
 	"github.com/disorn-inc/go-rest-ecom-th/internal/domains/middleware"
+	"github.com/disorn-inc/go-rest-ecom-th/internal/domains/monitor"
 	"github.com/disorn-inc/go-rest-ecom-th/pkg/databases"
 	"github.com/disorn-inc/go-rest-ecom-th/pkg/router"
 )
@@ -38,10 +39,15 @@ func (a *api) InitialRouter(r *router.FiberRouter) {
 }
 
 
-func CreateApi(dbDriver databases.Driver) API {
+func CreateApi(dbDriver databases.Driver, cfg config.IConfig) API {
 	middlewareService := middleware.NewMiddlewareService(middleware.NewMiddlewareRepository(dbDriver.GetPostgres()))
 	middleware := middleware.NewMiddleware(middlewareService)
-	apiRouter := NewRouters()
+
+	monitorRouter := monitor.NewMonitorRouter(cfg, middleware)
+
+	apiRouter := NewRouters(
+		monitorRouter,
+	)
 	return NewAPI(
 		apiRouter,
 		middleware,

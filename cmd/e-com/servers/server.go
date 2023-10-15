@@ -54,8 +54,8 @@ func (s *server) Start() {
 
 
 	dbDriver := databases.NewDrivers(s.db)
-	apis := api.CreateApi(dbDriver)
+	apis := api.CreateApi(dbDriver, s.cfg)
 	apis.InitialRouter(s.app)
 	s.app.ListenAndServe()()
-	
+
 }
